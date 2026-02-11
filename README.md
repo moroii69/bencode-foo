@@ -9,6 +9,11 @@ just learning + experimentation (as part of learning working of bittorrent inter
 
 ---
 
+## execution flow
+![decoder execution flow](./exec_flow.png)
+
+---
+
 ## features
 
 - decodes bencode strings, integers, lists, and dictionaries
