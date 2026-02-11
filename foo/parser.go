@@ -50,35 +50,35 @@ func (d *Decoder) decodeInt() (int64, error) {
 	return parsedNum, nil
 }
 
-func (d *Decoder) decodeList() ([]any, error){
+func (d *Decoder) decodeList() ([]any, error) {
 	d.pos++ // skip 'l'
 	var list []any
-	
+
 	// currentByte := d.data[d.pos]
 	// commented out this cus we have to read currentByte on moving cursor, not just once.
-	
+
 	for d.data[d.pos] != 'e' {
 		v, err := d.decode()
-		
+
 		if err != nil {
 			return nil, err
 		}
-		list = append(list,v) // adds decoded val to slice. prev_list + new val. 		
+		list = append(list, v) // adds decoded val to slice. prev_list + new val.
 	} // exits when 'e' is current byte.
-	
+
 	// move cursor past 'e'
 	d.pos++
-	return list, nil	
+	return list, nil
 }
 
 func (d *Decoder) decodeDict() (map[string]any, error) {
-	d.pos++ // skip 'd'
+	d.pos++                   // skip 'd'
 	m := make(map[string]any) // create empty map. we grow it dynamically
-	
+
 	for d.data[d.pos] != 'e' {
-		
+
 		// decode the key
-		k, err := d.decodeString()  // dictionary keys are strings
+		k, err := d.decodeStr() // dictionary keys are strings
 		if err != nil {
 			return nil, err
 		}
@@ -88,13 +88,48 @@ func (d *Decoder) decodeDict() (map[string]any, error) {
 		if err != nil {
 			return nil, err
 		}
-		
+
 		m[string(k)] = v // store the kv pair.. ex: "cow" → "moo"
 	}
-	
+
 	// move cursor past 'e'
 	d.pos++
-	
+
 	// return the map
 	return m, nil
+}
+
+func (d *Decoder) decodeStr() ([]byte, error) {
+	// here we dont do pos++ cus initial val is the length
+	start := d.pos
+
+	for d.data[d.pos] != ':' { // till it reaches :
+		d.pos++
+	}
+
+	// extract bytes for length
+	lengthBytes := d.data[start:d.pos]
+
+	// convert the []byte to string
+	lengthStr := string(lengthBytes) // cus strconv expects string
+
+	//convert str to int
+	length, err := strconv.Atoi(lengthStr) // same as parseInt used eariler
+	if err != nil || length < 0 {
+		return nil, fmt.Errorf("invalid string length")
+	}
+
+	// skip past :
+	d.pos++
+
+	if d.pos+length > len(d.data) {
+		return nil, fmt.Errorf("string length exceeds input size")
+	}
+
+	// slice out the actual string bytes
+	result := d.data[d.pos : d.pos+length]
+
+	// advance cursor past string
+	d.pos += length
+	return result, nil
 }
