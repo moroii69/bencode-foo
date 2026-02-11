@@ -49,3 +49,24 @@ func (d *Decoder) decodeInt() (int64, error) {
 
 	return parsedNum, nil
 }
+
+func (d *Decoder) decodeList() ([]any, error){
+	d.pos++ // skip 'l'
+	var list []any
+	
+	// currentByte := d.data[d.pos]
+	// commented out this cus we have to read currentByte on moving cursor, not just once.
+	
+	for d.data[d.pos] != 'e' {
+		v, err := d.decode()
+		
+		if err != nil {
+			return nil, err
+		}
+		list = append(list,v) // adds decoded val to slice. prev_list + new val. 		
+	} // exits when 'e' is current byte.
+	
+	// move cursor past 'e'
+	d.pos++
+	return list, nil	
+}
