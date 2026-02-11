@@ -10,7 +10,7 @@ just learning + experimentation (as part of learning working of bittorrent inter
 ---
 
 ## execution flow
-![decoder execution flow](./exec_flow.png)
+<img src="./exec_flow.png" width="400" />
 
 ---
 
