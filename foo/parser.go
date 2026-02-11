@@ -70,3 +70,31 @@ func (d *Decoder) decodeList() ([]any, error){
 	d.pos++
 	return list, nil	
 }
+
+func (d *Decoder) decodeDict() (map[string]any, error) {
+	d.pos++ // skip 'd'
+	m := make(map[string]any) // create empty map. we grow it dynamically
+	
+	for d.data[d.pos] != 'e' {
+		
+		// decode the key
+		k, err := d.decodeString()  // dictionary keys are strings
+		if err != nil {
+			return nil, err
+		}
+
+		// decode val
+		v, err := d.decode()
+		if err != nil {
+			return nil, err
+		}
+		
+		m[string(k)] = v // store the kv pair.. ex: "cow" → "moo"
+	}
+	
+	// move cursor past 'e'
+	d.pos++
+	
+	// return the map
+	return m, nil
+}
