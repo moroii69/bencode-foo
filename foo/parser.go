@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func (d *Decoder) decoder() (any, error) {
+func (d *Decoder) decode() (any, error) {
 	if d.pos >= len(d.data) {
 		return nil, errors.New("end of file..")
 	}
@@ -38,7 +38,7 @@ func (d *Decoder) decodeInt() (int64, error) {
 
 	numberBytes := d.data[start:d.pos]                       // extract bytes.
 	numberString := string(numberBytes)                      // need to convert to string for strconv to parse
-	parsedNum, err := strconv.ParseInt(numberString, 64, 10) // base 10, 64 bit signed
+	parsedNum, err := strconv.ParseInt(numberString, 10, 64) // base 10, 64 bit signed
 
 	if err != nil {
 		return 0, err
